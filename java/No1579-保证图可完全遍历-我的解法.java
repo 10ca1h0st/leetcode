@@ -41,13 +41,7 @@ class Solution {
         }
         genMST(n, newEdges, new HashSet<Integer>(List.of(BobType)));
         genMST(n, newEdges, new HashSet<Integer>(List.of(AliceType)));
-        System.out.println("edges length is "+edges.length);
-        System.out.println("mst size is "+mst.size());
-        // return newEdges.length - mst.size();
-        for(int index : mst) {
-            System.out.print(edges[index][0]+" "+edges[index][1]+" "+edges[index][2]+"$");
-        }
-        return deleted.size();
+        return newEdges.length - mst.size();
     }
 
     boolean isConnected(int n, int[][] edges, Set<Integer> filter) {
@@ -64,7 +58,8 @@ class Solution {
         return true;
     }
 
-    void genMST(int n, int[][] edges, Set<Integer> filter) {
+    // 这个方法错误之处在于，两次调用构成的二叉堆不同，因此在删除最小元素后，两次调用中，下一个最小元素可能不一样
+    void _genMST(int n, int[][] edges, Set<Integer> filter) {
         UnionFind uf = new UnionFind(n);
         PriorityQueue<int[]> pq = new PriorityQueue<>(new Comparator<int[]>() {
             @Override
@@ -94,6 +89,30 @@ class Solution {
         }
         // System.out.println(uf.countCC);
         // System.out.println(size);
+    }
+
+    void genMST(int n, int[][] edges, Set<Integer> filter) {
+        UnionFind uf = new UnionFind(n);
+        PriorityQueue<int[]> pq = new PriorityQueue<>(new Comparator<int[]>() {
+            @Override
+            public int compare(int[] a, int[] b) {
+                return a[4] - b[4];
+            }
+        });
+        for(int[] edge : edges) {
+            pq.add(edge);
+        }
+        int size = 0;
+        while(!pq.isEmpty() && size < n-1) {
+            int[] edge = pq.poll();
+            if(filter.contains(edge[1])) {
+                continue;
+            }
+            if(uf.union(edge[2], edge[3])) {
+                size++;
+                mst.add(edge[0]);
+            }
+        }
     }
 }
 
