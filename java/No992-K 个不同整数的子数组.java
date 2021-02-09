@@ -39,3 +39,55 @@ public class Solution {
         return res;
     }
 }
+
+// 使用直接的滑动窗口的解法
+public class Solution {
+    public int subarraysWithKDistinct(int[] A, int K) {
+        int length = A.length;
+        int left = 0;
+        int right = 0;
+        Map<Integer, Integer> numCount = new LinkedHashMap<>();
+        int count = 0;
+        while (right < length) {
+            int toAdd = A[right++];
+            int windowsRightSamNum = 0;
+            numCount.put(toAdd, numCount.getOrDefault(toAdd, 0) + 1);
+
+            // 如果当前窗口中字母个数满足K，需要看当前窗口右侧连续位置上还有多少个字符和当前窗口中的字符相同
+            if (numCount.size() == K) {
+                windowsRightSamNum = calWindowRightSameNumCount(numCount, right, A);
+            }
+
+            // 当前窗口中的字符满足K，子数组个数总数+1；
+            // 修正值需加上当前窗口右边和当前窗口中的字符相同的字符个数；
+            // 左移窗口
+            while (numCount.size() == K) {
+                count += 1;
+                count += windowsRightSamNum;
+                updateWindowsValue(numCount, A[left++]);
+            }
+        }
+        return count;
+    }
+
+    private int calWindowRightSameNumCount(Map<Integer, Integer> numCount, int right, int[] A) {
+        int countTmp = 0;
+        for (int i = right; i < A.length; i++) {
+            if (!numCount.containsKey(A[i])) {
+                break;
+            } else {
+                countTmp += 1;
+            }
+        }
+        return countTmp;
+    }
+
+    private void updateWindowsValue(Map<Integer, Integer> numCount, int key) {
+        if (numCount.get(key) == 1) {
+            numCount.remove(key);
+        } else {
+            numCount.put(key, numCount.get(key) - 1);
+        }
+    }
+}
+
