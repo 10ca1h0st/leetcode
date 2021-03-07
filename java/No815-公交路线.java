@@ -118,6 +118,82 @@ class Node {
     }
 }
 
+// 使用Dijkstra，初始时，将每一个公交站当做节点，对每一条线路中的所有节点，
+// 将它们两两连接起来，且边的权值设为1，即代表从一个节点到另一个节点，只要乘一次公交，
+// 图建立完成后，就是求源节点到目标节点之间的最短路径，使用Dijkstra算法
+class Solution {
+    public int numBusesToDestination(int[][] routes, int source, int target) {
+        // 邻接表表示图
+        Map<Integer, List<Edge>> graph = new HashMap<>();
+        // 顶点集合
+        Set<Integer> V = new HashSet<>();
+        for(int i = 0; i < routes.length; i++) {
+            int[] route = routes[i];
+            for(int j = 0; j < route.length; j++) {
+                V.add(route[j]);
+                List<Edge> list = graph.getOrDefault(route[j], new ArrayList<>());
+                for(int k = 0; k < route.length; k++) {
+                    if(k == j) {
+                        continue;
+                    }
+                    list.add(new Edge(route[k], 1));
+                }
+                graph.put(route[j], list);
+            }
+        }
+        return Dijkstra(graph, V, source, target);
+    }
+
+    public static int Dijkstra(Map<Integer, List<Edge>> graph, Set<Integer> V, int source, int target) {
+        // 节点到source的距离
+        Map<Integer, Integer> distance = new HashMap<>();
+        PriorityQueue<Integer> pq = new PriorityQueue<>(new Comparator<Integer>(){
+            @Override
+            public int compare(Integer a, Integer b) {
+                if(distance.get(a) > distance.get(b)) {
+                    return 1;
+                }
+                else if(distance.get(a) < distance.get(b)) {
+                    return -1;
+                }
+                return 0;
+            }
+        });
+        for(int v : V) {
+            distance.put(v, 10000000);
+        }
+        distance.put(source, 0);
+        pq.offer(source);
+        while(!pq.isEmpty()) {
+            int top = pq.poll();
+            if(top == target) {
+                return distance.get(top);
+            }
+            // 放松节点操作
+            for(Edge e : graph.getOrDefault(top, new ArrayList<>())) {
+                int v = e.dstV;
+                if(distance.get(v) > distance.get(top) + e.weight) {
+                    distance.put(v, distance.get(top) + e.weight);
+                    if(pq.contains(v)) {
+                        pq.remove(v);
+                    }
+                    pq.offer(v);
+                }
+            }
+        }
+        return -1;
+    }
+
+    static class Edge {
+        int dstV;
+        int weight;
+        Edge(int dstV, int weight) {
+            this.dstV = dstV;
+            this.weight = weight;
+        }
+    }
+}
+
 // 官方代码
 import java.awt.Point;
 
