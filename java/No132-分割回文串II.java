@@ -36,7 +36,7 @@ class Solution {
 著作权归作者所有。商业转载请联系作者获得授权，非商业转载请注明出处。
 
 
-// 第28/29样例失败，为什么？
+// 第28/29样例失败，为什么？找到了原因，但是会超时
 class Solution {
     // 字符串[i...j]是否为回文串，默认i==j时，和，i>j时为true
     static boolean[][] panlidrome;
@@ -108,9 +108,12 @@ class Solution {
                 left++;
                 right++;
             }
-            if(found) {
-                break;
-            }
+			// 不应该有这个判断，因为并不是每次切割越长越好，
+			// 可能这次切割长，但是剩下的字符串切割次数很多，
+			// 导致最终切割次数之和反而变大
+            //if(found) {
+            //    break;
+            //}
             panlidromeLength--;
         }
         memo[start][end] = res;
