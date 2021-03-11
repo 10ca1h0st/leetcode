@@ -24,6 +24,31 @@ public class HDOJ1003 {
             System.out.println();
         }
     }
+	
+	public static int[] maxSubSequence(int[] arr) {
+        Node[] dp = new Node[arr.length];
+        dp[0] = new Node(arr[0], 1, 1);
+        for(int i = 1; i < dp.length; i++) {
+            if(dp[i-1].v >= 0) {
+                dp[i] = new Node(dp[i-1].v+arr[i], dp[i-1].i, i+1);
+            }
+            else {
+                dp[i] = new Node(arr[i], i+1, i+1);
+            }
+        }
+        int[] res = new int[3];
+        res[0] = dp[0].v;
+        res[1] = dp[0].i;
+        res[2] = dp[0].j;
+        for(int i = 1; i < dp.length; i++) {
+            if(dp[i].v > res[0]) {
+                res[0] = dp[i].v;
+                res[1] = dp[i].i;
+                res[2] = dp[i].j;
+            }
+        }
+        return res;
+    }
 
     public static int[] maxSubSequence(int[] arr) {
         int max = Integer.MIN_VALUE;
@@ -44,5 +69,16 @@ public class HDOJ1003 {
             }
         }
         return res;
+    }
+}
+
+class Node {
+    int v;
+    int i;
+    int j;
+    Node(int v, int i, int j) {
+        this.v = v;
+        this.i = i;
+        this.j = j;
     }
 }
