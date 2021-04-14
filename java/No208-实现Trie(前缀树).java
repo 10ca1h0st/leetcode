@@ -55,8 +55,7 @@ class Trie {
  * boolean param_3 = obj.startsWith(prefix);
  */
  
- 
- // 懒加载机制
+// 懒加载机制
  class Trie {
 
     static class TrieNode {
@@ -108,23 +107,32 @@ class Trie {
         // 找到word[i:-1]和v的公共前缀，然后从公共前缀处开始，分裂出两个子节点
         int j = i;
         int split = 0;
-        for(; j < word.length() && split < v.length(); split++, j++) {
+        for(; j < word.length(); split++, j++) {
             if(word.charAt(j) != v.charAt(split)) {
                 break;
             }
         }
         if(j == word.length()) {
-            next.value = v.substring(0, split);
-            next.isLeaf = true;
+            next.value = word.substring(i, word.length());
+            TrieNode origin = next.children[v.charAt(split)-base];
             next.children[v.charAt(split)-base] = new TrieNode(v.substring(split, v.length()));
+            if(origin != null) {
+                next.children[v.charAt(split)-base].children[v.charAt(split)-base] = origin;
+            }
         }
         else {
             next.isLeaf = false;
             next.value = v.substring(0, split);
-            char child = word.charAt(j);
-            next.children[child-base] = new TrieNode(word.substring(j, word.length()));
-            child = v.charAt(split);
-            next.children[child-base] = new TrieNode(v.substring(split, v.length()));
+
+            TrieNode[] originChildren = next.children;
+            next.children = new TrieNode[26];
+            
+            ch = v.charAt(split);
+            next.children[ch-base] = new TrieNode(v.substring(split, v.length()));
+            next.children[ch-base].children = originChildren;
+
+            ch = word.charAt(j);
+            next.children[ch-base] = new TrieNode(word.substring(j, word.length()));
         }
     }
 
@@ -145,11 +153,8 @@ class Trie {
                 return i;
             }
             String v = next.value;
-            if(i + v.length() > word.length()) {
-                helper = cur;
-                return i;
-            }
-            if(!v.equals(word.substring(i, i+v.length()))) {
+            if(i + v.length() > word.length() ||
+			!v.equals(word.substring(i, i+v.length()))) {
                 helper = cur;
                 return i;
             }
@@ -158,7 +163,7 @@ class Trie {
         }
         if(!cur.isLeaf) {
             helper = cur;
-            return i;
+            return word.length();
         }
         return -1;
     }
