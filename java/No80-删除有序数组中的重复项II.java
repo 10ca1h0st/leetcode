@@ -38,3 +38,47 @@ class Solution {
         return slow;
     }
 }
+
+// 再次做 2021-4-18
+class Solution {
+    public int removeDuplicates(int[] nums) {
+        if(nums.length <= 2) {
+            return nums.length;
+        }
+        int slow = 2;
+        int fast = 2;
+        while(fast < nums.length) {
+            if(nums[fast] == nums[fast-1] && nums[fast] == nums[fast-2]) {
+                // 连续第三次出现
+                int flag = nums[fast];
+                while(fast < nums.length) {
+                    if(flag == nums[fast]) {
+                        fast++;
+                    }
+                    else {
+                        break;
+                    }
+                }
+            }
+            else if(nums[fast] == nums[fast-1]) {
+                // 连续第二次出现
+                nums[slow] = nums[fast];
+                slow++;
+                fast++;
+            }
+            else {
+                // 第一次出现
+                nums[slow] = nums[fast];
+                slow++;
+                fast++;
+                if(fast < nums.length && nums[fast] == nums[fast-1]) {
+                    // 第二次出现
+                    nums[slow] = nums[fast];
+                    slow++;
+                    fast++;
+                }
+            }
+        }
+        return slow;
+    }
+}
