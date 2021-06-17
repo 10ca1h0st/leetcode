@@ -1,0 +1,121 @@
+class Solution {
+    public boolean isNumber(String s) {
+        if(s.charAt(0) == 'E' || s.charAt(0) == 'e') {
+            return false;
+        }
+        if(s.charAt(s.length()-1) == 'E' || s.charAt(s.length()-1) == 'e') {
+            return false;
+        }
+        int countE = 0;
+        boolean lower = true;
+        for(char c : s.toCharArray()) {
+            if(c == 'e' || c == 'E') {
+                countE++;
+            }
+            if(c == 'E') {
+                lower = false;
+            }
+        }
+        if(countE > 1) {
+            return false;
+        }
+        String[] part = null;
+        if(countE == 0) {
+            if(!isIntegerOrFloat(s)) {
+                return false;
+            }
+        }
+        else {
+            if(lower) {
+                part = s.split("e");
+            }
+            else  {
+                part = s.split("E");
+            }
+            if(!isInteger(part[1])) {
+                return false;
+            }
+            if(!isIntegerOrFloat(part[0])) {
+                return false;
+            }
+        }
+        return true;
+    }
+
+    // [+/-]xxx
+    public boolean isInteger(String s) {
+        if(s.length() == 0) {
+            return false;
+        }
+        int i = 0;
+        for(; i < s.length(); i++) {
+            char c = s.charAt(i);
+            if(c > '9' || c < '0') {
+                if(i == 0 && s.length() != 1 && (c == '+' || c == '-')) {
+                }
+                else {
+                    return false;
+                }
+            }
+        }
+        return true;
+    }
+
+    // xxx
+    public boolean isInteger2(String s) {
+        if(s.length() == 0) {
+            return false;
+        }
+        int i = 0;
+        for(; i < s.length(); i++) {
+            char c = s.charAt(i);
+            if(c > '9' || c < '0') {
+                return false;
+            }
+        }
+        return true;
+    }
+
+    // [+/-]xxx.xxx
+    public boolean isIntegerOrFloat(String s) {
+        if(s.length() == 0) {
+            return false;
+        }
+        int countDot = 0;
+        for(char c : s.toCharArray()) {
+            if(c == '.') {
+                countDot++;
+            }
+        }
+        if(countDot > 1) {
+            return false;
+        }
+        if(countDot == 0) {
+            return isInteger(s);
+        }
+        String[] part = s.split("\\.");
+        if(part.length == 1) {
+            // [+/-]xxx.
+            return isInteger(part[0]);
+        }
+        if(part.length == 2) {
+            if(part[0].length() == 0) {
+                // .xxx
+                return isInteger2(part[1]);
+            }
+            else if(part[0].length() == 1) {
+                // <+/->.xxx
+                // x.xxx
+                if(part[0].charAt(0) == '+' || part[0].charAt(0) == '-') {
+                    return isInteger2(part[1]);
+                }
+                return isInteger2(part[0]) && isInteger2(part[1]);
+            }
+            else if(part[0].length() > 1) {
+                // [+/-]xxx.xxx
+                return isInteger(part[0]) && isInteger2(part[1]);
+            }
+        }
+        return false;
+    }
+}
