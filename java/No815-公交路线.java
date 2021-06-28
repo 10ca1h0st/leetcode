@@ -1,3 +1,139 @@
+// 官方解答 BFS
+class Solution {
+    public int numBusesToDestination(int[][] routes, int source, int target) {
+        if (source == target) {
+            return 0;
+        }
+
+        int n = routes.length;
+        boolean[][] edge = new boolean[n][n];
+        Map<Integer, List<Integer>> rec = new HashMap<Integer, List<Integer>>();
+        for (int i = 0; i < n; i++) {
+            for (int site : routes[i]) {
+                List<Integer> list = rec.getOrDefault(site, new ArrayList<Integer>());
+                for (int j : list) {
+                    edge[i][j] = edge[j][i] = true;
+                }
+                list.add(i);
+                rec.put(site, list);
+            }
+        }
+
+        int[] dis = new int[n];
+        Arrays.fill(dis, -1);
+        Queue<Integer> que = new LinkedList<Integer>();
+        for (int site : rec.getOrDefault(source, new ArrayList<Integer>())) {
+            dis[site] = 1;
+            que.offer(site);
+        }
+        while (!que.isEmpty()) {
+            int x = que.poll();
+            for (int y = 0; y < n; y++) {
+                if (edge[x][y] && dis[y] == -1) {
+                    dis[y] = dis[x] + 1;
+                    que.offer(y);
+                }
+            }
+        }
+
+        int ret = Integer.MAX_VALUE;
+        for (int site : rec.getOrDefault(target, new ArrayList<Integer>())) {
+            if (dis[site] != -1) {
+                ret = Math.min(ret, dis[site]);
+            }
+        }
+        return ret == Integer.MAX_VALUE ? -1 : ret;
+    }
+}
+
+作者：LeetCode-Solution
+链接：https://leetcode-cn.com/problems/bus-routes/solution/gong-jiao-lu-xian-by-leetcode-solution-yifz/
+来源：力扣（LeetCode）
+著作权归作者所有。商业转载请联系作者获得授权，非商业转载请注明出处。
+
+
+//2021-6-28再次解答，超时，43/45
+class Solution {
+    public int numBusesToDestination(int[][] routes, int source, int target) {
+        if(target == source) {
+            return 0;
+        }
+        int maxStop = 0;
+        for(int[] route : routes) {
+            for(int stop : route) {
+                if(stop > maxStop) {
+                    maxStop = stop;
+                }
+            }
+        }
+        // distance[i]表示从source到i的最小换乘次数
+        int[] distance = new int[maxStop + 1];
+        for(int i = 0; i < distance.length; i++) {
+            distance[i] = routes.length + 1;
+        }
+        distance[source] = 1;
+        PriorityQueue<Integer> pq = new PriorityQueue<>(new Comparator<Integer>() {
+            @Override
+            public int compare(Integer a, Integer b) {
+                return distance[a] - distance[b];
+            }
+        });
+        pq.offer(source);
+        List<Integer> neighbors = null;
+        Set<Integer> seen = new HashSet<>();
+        seen.add(source);
+        while(!pq.isEmpty()) {
+            int top = pq.poll();
+            if(top == target) {
+                return distance[target];
+            }
+            seen.add(top);
+            neighbors = getNeighbors(routes, seen, top);
+            if(top == source) {
+                for(int neighbor : neighbors) {
+                    distance[neighbor] = 1;
+                    pq.offer(neighbor);
+                }
+                continue;
+            }
+            for(int neighbor : neighbors) {
+                if(distance[neighbor] > distance[top] + 1) {
+                    distance[neighbor] = distance[top] + 1;
+                    pq.remove(neighbor);
+                    pq.offer(neighbor);
+                    // seen.add(neighbor);
+                }
+            }
+        }
+        return -1;
+    }
+
+    public List<Integer> getNeighbors(int[][] routes, Set<Integer> seen, int center) {
+        List<Integer> res = new ArrayList<>();
+        int index = 0;
+        for(int[] route : routes) {
+            boolean isNeighbor = false;
+            for(int stop : route) {
+                if(stop == center) {
+                    isNeighbor = true;
+                    break;
+                }
+            }
+            if(isNeighbor) {
+                for(int stop : route) {
+                    if(!seen.contains(stop)) {
+                        res.add(stop);
+                    }
+                }
+            }
+            index++;
+        }
+        return res;
+    }
+}
+
+
+
 class Solution {
 
     static int res;
