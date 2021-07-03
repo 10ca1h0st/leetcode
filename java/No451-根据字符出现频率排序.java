@@ -9,7 +9,9 @@ class Solution {
         }
         PriorityQueue<Character> pq = new PriorityQueue<>(s.length(), new Comparator<Character>() {
             public int compare(Character a, Character b) {
-                if(count.get(a) != count.get(b)) {
+				// 因为对-128到127的Integer，jvm会有缓存
+                //if(count.get(a) != count.get(b)) {
+				if(!count.get(a).equals(count.get(b))) {
                     return count.get(b) - count.get(a);
                 }
                 else {
