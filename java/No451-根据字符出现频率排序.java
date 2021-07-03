@@ -9,7 +9,7 @@ class Solution {
         }
         PriorityQueue<Character> pq = new PriorityQueue<>(s.length(), new Comparator<Character>() {
             public int compare(Character a, Character b) {
-				// 因为对-128到127的Integer，jvm会有缓存
+				// 当count.get()的值超过了127，!=比较的就是对象地址，会有问题，因此要用equals比较实际的int值
                 //if(count.get(a) != count.get(b)) {
 				if(!count.get(a).equals(count.get(b))) {
                     return count.get(b) - count.get(a);
