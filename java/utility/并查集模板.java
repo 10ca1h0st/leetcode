@@ -47,4 +47,12 @@ class UF {
         }
         return x;
     }
+
+    // 另一种find写法
+    private int find(int x) {
+        if(parent[x] != x) {
+            parent[x] = find(parent[x]);
+        }
+        return parent[x];
+    }
 }
