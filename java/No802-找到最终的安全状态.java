@@ -28,6 +28,45 @@ class Solution {
 }
 
 
+// 自己的做法 击败24%
+class Solution {
+    public List<Integer> eventualSafeNodes(int[][] graph) {
+        int n = graph.length;
+        boolean[] visited = new boolean[n];
+        Set<Integer> inCycle = new HashSet<>(n);
+        for (int i = 0; i < n; i++) {
+            inCycle.add(i);
+        }
+        Set<Integer> path = null;
+        for (int i = 0; i < n; i++) {
+            if (!visited[i]) {
+                path = new HashSet<>();
+                bfs(i, graph, visited, inCycle, path);
+            }
+        }
+        List<Integer> ans = new ArrayList<>(inCycle);
+        Collections.sort(ans);
+        return ans;
+    }
+
+    private void bfs(int v, int[][] graph, boolean[] visited, Set<Integer> inCycle, Set<Integer> path) {
+        visited[v] = true;
+        path.add(v);
+        for (int to : graph[v]) {
+            if (path.contains(to) || (visited[to] && !inCycle.contains(to))) {
+                // 出现环
+                for (int i : path) {
+                    inCycle.remove(i);
+                }
+            } else if (!visited[to]) {
+                bfs(to, graph, visited, inCycle, path);
+            }
+        }
+        path.remove(v);
+    }
+}
+
+
 // 超时
 class Solution {
     public List<Integer> eventualSafeNodes(int[][] graph) {
