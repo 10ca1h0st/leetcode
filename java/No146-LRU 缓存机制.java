@@ -1,3 +1,108 @@
+// 自己写的
+class Node {
+    Node next;
+    Node prev;
+    int k;
+    int v;
+
+    Node(int k, int v) {
+        this.k = k;
+        this.v = v;
+    }
+}
+
+class DoubleList {
+    Node head;
+    Node tail;
+
+    DoubleList() {
+        head = new Node(-1, -1);
+        tail = new Node(-1, -1);
+        head.next = tail;
+        tail.prev = head;
+    }
+
+    // 尾部插入
+    void append(Node node) {
+        Node last = tail.prev;
+        // 断开
+        last.next = null;
+        tail.prev = null;
+        // 重新连接
+        last.next = node;
+        node.prev = last;
+        tail.prev = node;
+        node.next = tail;
+    }
+
+    // 移除
+    void remove(Node node) {
+        Node before = node.prev;
+        Node after = node.next;
+        before.next = after;
+        after.prev = before;
+    }
+}
+
+class LRUCache {
+    DoubleList list;
+    Map<Integer, Node> map;
+    int size;
+    int capacity;
+
+    public LRUCache(int capacity) {
+        list = new DoubleList();
+        map = new HashMap<>();
+        size = 0;
+        this.capacity = capacity;
+    }
+
+    public int get(int key) {
+        if (!map.containsKey(key)) {
+            return -1;
+        }
+        Node node = map.get(key);
+        list.remove(node);
+        list.append(node);
+        return node.v;
+    }
+
+    public void put(int key, int value) {
+        if (map.containsKey(key)) {
+            Node node = map.get(key);
+            list.remove(node);
+            node.v = value;
+            list.append(node);
+            return;
+        }
+        if (size == capacity) {
+            // 去除最久的
+            removeOld();
+            Node node = new Node(key, value);
+            map.put(key, node);
+            list.append(node);
+            return;
+        }
+        Node node = new Node(key, value);
+        map.put(key, node);
+        list.append(node);
+        size++;
+        return;
+    }
+
+    private void removeOld() {
+        Node old = list.head.next;
+        list.remove(old);
+        map.remove(old.k);
+    }
+}
+
+
+
+
+
+
+
 class LRUCache {
     LinkedHashMap<Integer, Integer> listMap;
 
