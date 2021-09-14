@@ -63,6 +63,33 @@ public class 由树的两种遍历方式重建树 {
     }
 	
 // 中序和后序
+    class Solution {
+	    public Map<Integer, Integer> indexMap;
+
+	    public TreeNode buildTree(int[] inorder, int[] postorder) {
+	        indexMap = new HashMap<>();
+	        for (int i = 0; i < inorder.length; i++) {
+	            indexMap.put(inorder[i], i);
+	        }
+	        return helper(inorder, postorder, 0, inorder.length-1, 0, postorder.length-1);
+	    }
+
+	    public TreeNode helper(int[] inorder, int[] postorder, int inStart, int inEnd, int postStart, int postEnd) {
+	        if (inStart > inEnd) {
+	            return null;
+	        }
+	        int rootVal = postorder[postEnd];
+	        // 找到inorder中root的位置
+	        int inRootPos = indexMap.get(rootVal);
+	        int rightSize = inEnd - inRootPos;
+	        TreeNode root = new TreeNode(rootVal);
+	        root.left = helper(inorder, postorder, inStart, inRootPos-1, postStart, postEnd-rightSize-1);
+	        root.right = helper(inorder, postorder, inRootPos+1, inEnd, postEnd-1-rightSize+1, postEnd-1);
+	        return root;
+	    }
+	}
+
+	
 	class Solution {
 		int post_idx;
 		int[] postorder;
